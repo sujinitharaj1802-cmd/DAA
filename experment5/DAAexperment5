@@ -1,0 +1,181 @@
+import random
+import matplotlib.pyplot as plt
+
+# ---------------------------------------------------
+# Global Comparison Counter
+# ---------------------------------------------------
+
+comparison_count = 0
+
+
+# ---------------------------------------------------
+# Divide and Conquer Method
+# ---------------------------------------------------
+
+def min_max_dc(arr, low, high):
+    global comparison_count
+
+    # Base Case: One element
+    if low == high:
+        return arr[low], arr[low]
+
+    # Base Case: Two elements
+    if high == low + 1:
+        comparison_count += 1
+
+        if arr[low] < arr[high]:
+            return arr[low], arr[high]
+        else:
+            return arr[high], arr[low]
+
+    # Divide
+    mid = (low + high) // 2
+
+    left_min, left_max = min_max_dc(arr, low, mid)
+    right_min, right_max = min_max_dc(arr, mid + 1, high)
+
+    # Combine
+    comparison_count += 1
+    overall_min = left_min if left_min < right_min else right_min
+
+    comparison_count += 1
+    overall_max = left_max if left_max > right_max else right_max
+
+    return overall_min, overall_max
+
+
+# ---------------------------------------------------
+# Naive Method
+# ---------------------------------------------------
+
+def min_max_naive(arr):
+
+    minimum = arr[0]
+    maximum = arr[0]
+
+    comparisons = 0
+
+    for value in arr[1:]:
+
+        comparisons += 1
+        if value < minimum:
+            minimum = value
+
+        comparisons += 1
+        if value > maximum:
+            maximum = value
+
+    return minimum, maximum, comparisons
+
+
+# ---------------------------------------------------
+# Demonstration
+# ---------------------------------------------------
+
+arr = [3, 1, 7, 4, 9, 2, 8, 5, 6, 0]
+
+comparison_count = 0
+
+minimum, maximum = min_max_dc(arr, 0, len(arr) - 1)
+
+dc_comparisons = comparison_count
+
+_, _, naive_comparisons = min_max_naive(arr)
+
+print("=" * 60)
+print("MINIMUM AND MAXIMUM USING DIVIDE & CONQUER")
+print("=" * 60)
+
+print("Array :", arr)
+print("Minimum Value :", minimum)
+print("Maximum Value :", maximum)
+print("Divide & Conquer Comparisons :", dc_comparisons)
+print("Naive Comparisons :", naive_comparisons)
+
+
+# ---------------------------------------------------
+# Performance Analysis
+# ---------------------------------------------------
+
+sizes = [10, 100, 1000, 10000]
+
+dc_values = []
+naive_values = []
+formula_values = []
+
+print("\n")
+print("=" * 75)
+print("PERFORMANCE ANALYSIS")
+print("=" * 75)
+
+print(f'{"Size":<10}{"D&C":>12}{"Naive":>12}{"Formula(3n/2-2)":>20}')
+print("-" * 60)
+
+for size in sizes:
+
+    arr = [random.randint(1, 10000) for _ in range(size)]
+
+    comparison_count = 0
+
+    min_max_dc(arr, 0, len(arr) - 1)
+
+    dc = comparison_count
+
+    _, _, naive = min_max_naive(arr)
+
+    formula = (3 * size) // 2 - 2
+
+    dc_values.append(dc)
+    naive_values.append(naive)
+    formula_values.append(formula)
+
+    print(f"{size:<10}{dc:>12}{naive:>12}{formula:>20}")
+
+
+# ---------------------------------------------------
+# Graph
+# ---------------------------------------------------
+
+plt.figure(figsize=(9, 6))
+
+plt.plot(
+    sizes,
+    dc_values,
+    marker='o',
+    linewidth=2,
+    markersize=8,
+    label='Divide & Conquer'
+)
+
+plt.plot(
+    sizes,
+    naive_values,
+    marker='s',
+    linewidth=2,
+    markersize=8,
+    label='Naive'
+)
+
+plt.plot(
+    sizes,
+    formula_values,
+    marker='^',
+    linewidth=2,
+    linestyle='--',
+    markersize=8,
+    label='Formula (3n/2 - 2)'
+)
+
+plt.title("Performance Analysis of Min-Max Algorithms")
+
+plt.xlabel("Input Size")
+
+plt.ylabel("Number of Comparisons")
+
+plt.grid(True)
+
+plt.legend()
+
+plt.tight_layout()
+
+plt.show()
